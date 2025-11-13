@@ -1,0 +1,18 @@
+Question 2: Pointers and Functions 
+Write a C program to model currency exchange transaction at a bank. The program should implement the function curr_change described below according to its specifications. 
+
+In the main function, create a data structure to store the exchange rates between the local currency and a set of international currencies (for both buying and selling); you should include at least three international currencies. The currencies should be modelled using C-strings.
+
+For simplicity, assume that the maximum exchangeable amount is fixed (based on the local currency). Exchanges can only occur between the local currency and one international currency, either as sell or buy operation. 
+
+In the main function, prompt the user to input the amount of money, its currency, and the target currency. Your program should validate user’s input before being processed. For valid inputs, the program should then display the exchange rate, the converted amount, any leftover amount, and the bank’s cap on the transaction amount.
+
+The function curr_change is defined as follows: 
+void curr_change (float amCur1, float amMax, float excRate, float *amCur2,float *leftOver) 
+Where the parameters: 
+• amCur1: specifies the amount in currency1 provided by a customer. 
+• amMax: specifies the maximum amount in local currency which can be exchanged at the bank. 
+• excRate: specifies the exchange rate from currency 1 to currency 2. 
+• amCur2: specifies the amount the customer gets in Currency2. 
+• leftOver: specifies the non-converted amount in currency 1 returned to the customer if amMax gets exceeded. 
+The parameters amCur2 and leftOver must be used as pointers in the function.
