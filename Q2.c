@@ -56,9 +56,12 @@ int main(){
                 if (amount > maxAmount) {
                     printf("Amount exceeds maximum limit of %d %s.\n", maxAmount, localcurrency);
                 } else {
-                    // exchangedAmount = amount / rates[i].buyRate;
-                    // printf("You will receive %.2f %s for %.2f %s.\n",
-                    //     exchangedAmount, rates[i].currency, amount, localcurrency);
+                    exchangedRate = 1.0f / rates[i].buyRate;
+                    curr_change(amount, (float)maxAmount, exchangedRate, &exchangedAmount, &leftoverAmount);
+                    printf("Rate used: 1 %s = %.4f %s\n", localcurrency, exchangedRate, rates[i].currency);
+                    printf("You will receive %.4f %s for %.2f %s.\n",
+                           exchangedAmount, rates[i].currency, amount, localcurrency);
+                    printf("Leftover returned: %.4f %s\n", leftoverAmount, localcurrency);
                 }
                 break;
             } else if (strcmp(rates[i].currency, sourceCurrency) == 0) {
@@ -69,9 +72,12 @@ int main(){
                 if (amount > maxAmount) {
                     printf("Amount exceeds maximum limit of %d %s.\n", maxAmount, sourceCurrency);
                 } else {
-                    // exchangedAmount = amount * rates[i].sellRate;
-                    // printf("You will receive %.2f %s for %.2f %s.\n",
-                    //     exchangedAmount, rates[i].currency, amount, localcurrency);
+                    exchangedRate = rates[i].sellRate;
+                    curr_change(amount, (float)maxAmount, exchangedRate, &exchangedAmount, &leftoverAmount);
+                    printf("Rate used: 1 %s = %.4f %s\n", sourceCurrency, exchangedRate, localcurrency);
+                    printf("You will receive %.4f %s for %.2f %s.\n",
+                           exchangedAmount, localcurrency, amount, sourceCurrency);
+                    printf("Leftover returned: %.4f %s\n", leftoverAmount, sourceCurrency);
                 }
                 break;
             }
@@ -95,5 +101,12 @@ void displayRates(ExchangeRate rates[], int count) {
 }
 
 void curr_change(float amCur1, float amMax, float excRate, float *amCur2, float *leftOver) {
-
+    float convertedAmount = amCur1 * excRate;
+    if (convertedAmount > amMax) {
+        *amCur2 = amMax;
+        *leftOver = (convertedAmount - amMax) / excRate;
+    } else {
+        *amCur2 = convertedAmount;
+        *leftOver = 0.0f;
+    }
 }
