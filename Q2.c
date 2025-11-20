@@ -15,17 +15,15 @@ typedef struct {
 } ExchangeRate;
 
 int main(){
-    ExchangeRate rates[MAX_CURRENCIES];
-    int count = 0;
-
-    char localcurrency[MAX_CURRENCY_NAME] = "AED";
-    int maxAmount = 10000;
-
-    rates = {
+    ExchangeRate rates[MAX_CURRENCIES] = {
         {"USD", 3.67, 3.75},
         {"EUR", 4.10, 4.20},
         {"GBP", 4.50, 4.60},
     };
+    int count = 0;
+
+    char localcurrency[MAX_CURRENCY_NAME] = "AED";
+    int maxAmount = 10000;
 
     printf("Welcome to the Currency Exchange Service!\n");
     displayRates(rates, MAX_CURRENCIES);
