@@ -2,17 +2,17 @@
 #include <string.h>
 #include <ctype.h>
 
-
 #define MAX_CURRENCIES 3
 #define MAX_CURRENCY_NAME 4
-
-
 
 typedef struct {
     char currency[MAX_CURRENCY_NAME];
     float buyRate;      
     float sellRate;     
 } ExchangeRate;
+
+void displayRates(ExchangeRate rates[], int count);
+void curr_change(float amCur1, float amMax, float excRate, float *amCur2, float *leftOver);
 
 int main(){
     ExchangeRate rates[MAX_CURRENCIES] = {
@@ -41,7 +41,8 @@ int main(){
     float exchangedAmount;
     float leftoverAmount;
     int found = 0;
-    if (strcmp(sourceCurrency, localcurrency) == 0 && strcmp(targetCurrency, localcurrency) == 0) {
+    if ((strcmp(sourceCurrency, localcurrency) == 0 && strcmp(targetCurrency, localcurrency) == 0) ||
+        (strcmp(sourceCurrency, localcurrency) != 0 && strcmp(targetCurrency, localcurrency) != 0)) {
         printf("Exchanges must be between %s and one supported international currency.\n", localcurrency);
         return 0;
     } else {
