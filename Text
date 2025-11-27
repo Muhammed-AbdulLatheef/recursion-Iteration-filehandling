@@ -16,3 +16,24 @@ Where the parameters:
 • amCur2: specifies the amount the customer gets in Currency2. 
 • leftOver: specifies the non-converted amount in currency 1 returned to the customer if amMax gets exceeded. 
 The parameters amCur2 and leftOver must be used as pointers in the function.
+
+
+A text file named students.txt contains student records, each consisting of a name (string) and a
+ mark (integer), the file is attached. 
+However, the file may contain corrupted or incomplete records, for example, missing names, missing 
+marks, or non-printable characters in the name field. 
+Write a C program to: 
+a) Read all records from the text file
+ b) Validate each record as follows:
+ • The name field must be non-empty and consist of printable, non-numeric characters1.
+ • The mark field must be an integer. For simplicity, we assume that if the mark field is
+ numerical, its value is integer.
+ c) If a record is invalid (corrupted), skip it by moving the file pointer to the next line
+ d) Display:
+ • Each valid record as it is read.
+ • The total number of valid and corrupted records.
+ • The average mark of valid records (if any).
+ e) Handle possible file I/O errors (e.g., file not found).
+ What to submit 
+• C code concisely commented along with evidence of testing.
+ • Explain, with reference to the relevant code statements, how you handled corrupted data in the file.
