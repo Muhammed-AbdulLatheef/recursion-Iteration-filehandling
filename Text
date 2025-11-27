@@ -37,3 +37,60 @@ a) Read all records from the text file
  What to submit 
 • C code concisely commented along with evidence of testing.
  • Explain, with reference to the relevant code statements, how you handled corrupted data in the file.
+
+
+ Question 4: C++ Coding 
+A laboratory collects sensor measurements of different data types. Assume two sensors, one providing an 
+integer value and the other providing a double value. The sensor readings will have to be calibrated by a 
+multiplicative factor and an offset value as explained below.  
+1You can use the functions isprint and isdigit from the string.h header 
+In the requested program, display all values right-aligned using C++ I/O manipulators, with a field width of 
+10 and a precision of 4 digits. Input and output must be performed using C++ stream objects (cin and cout) 
+rather than C-style functions. 
+ Write a C++ program which includes the following functions:
+ 1) Template Function: S calibrateValue(...)
+ Parameters:
+ x: a constant input C++ reference variable2 of the template type S.
+ factor: a char type numerical value.
+ Action: 
+Returns the product of x and factor. The return value is of type S. 
+2) Function: void adjustReading(....) 
+Parameters: 
+value: a pointer to a double representing a sensor reading. 
+offset: a double with a default value of 1.25. 
+Action: 
+Adds offset to the sensor reading value.
+ The function does not return a value. 
+3) Function: void clampReading(...)
+ Parameter: 
+r: a C++ reference variable to a double representing a sensor reading. 
+Action: 
+Modifies the sensor reading in place such that: 
+• If r < 0, it is set to 0.
+ • If r > 100, it is set to 100.
+ 4) Function: double computeDifference(int a, double b)
+ Returns the value of a − b. 
+5) main() Function
+ i)
+ Ask the user to input:
+ • One integer sensor reading.
+ 2Reference to the definition of C++ reference variable and constant in the lecture notes 
+• One double sensor reading.
+ and read the values accordingly. 
+ii)
+ Call the template function calibrateValue() twice to calibrate the integer sensor reading and the
+ double sensor reading by 2
+ Print the resulting values of the sensor readings. 
+iii) Convert the calibrated integer sensor reading to double
+ iv) Call the function adjustReading() twice:
+ • First for the converted integer sensor reading, without providing the second argument of the
+ function.
+ • Second for the double sensor reading, providing 3.4 as the second argument of the function.
+ Print the resulting values of the sensor readings. 
+v) Call clampReading() on two adjusted values from step (iv)
+ Print the resulting values of the sensor readings.
+ vi) Convert the double value of the integer sensor back to an integer. Print the resulting value of the
+ sensor reading.
+ vii) Using computeDifference(), compute the difference between the clamped values of double and
+ integer sensor readings.
+ Print the resulting value
