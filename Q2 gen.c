@@ -1,131 +1,85 @@
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
+#include <iostream>
+#include <iomanip>
+#include <cctype>
 
-#define MAX_CURRENCIES 3
-#define MAX_CURRENCY_NAME 4
+using namespace std;
 
-typedef struct {
-    char currency[MAX_CURRENCY_NAME];
-    float buyRate;      
-    float sellRate;     
-} ExchangeRate;
-
-/* prototypes */
-void displayRates(ExchangeRate rates[], int count);
-void curr_change(float amCur1, float amMax, float excRate, float *amCur2, float *leftOver);
-
-static void strtoupper(char *s) {
-    for (; *s; ++s) *s = (char) toupper((unsigned char)*s);
+/* 1) Template function: calibrateValue
+   factor is a char "numerical" value (e.g. '2'). We interpret digit chars as their numeric value.
+*/
+template<typename S>
+S calibrateValue(const S &x, char factor) {
+    double factorVal;
+    if (isdigit(static_cast<unsigned char>(factor))) factorVal = (factor - '0');
+    else factorVal = static_cast<int>(factor); /* fallback */
+    return static_cast<S>(x * static_cast<S>(factorVal));
 }
 
-int main(){
-    ExchangeRate rates[MAX_CURRENCIES] = {
-        {"USD", 3.67f, 3.75f},
-        {"EUR", 4.10f, 4.20f},
-        {"GBP", 4.50f, 4.60f},
-    };
-    int count = 0;
+/* 2) adjustReading: add offset (default 1.25) to a double pointed by value */
+void adjustReading(double *value, double offset = 1.25) {
+    if (value) *value += offset;
+}
 
-    char localcurrency[MAX_CURRENCY_NAME] = "AED";
-    int maxAmount = 10000;
+/* 3) clampReading: clamp in-place to [0,100] */
+void clampReading(double &r) {
+    if (r < 0.0) r = 0.0;
+    else if (r > 100.0) r = 100.0;
+}
 
-    printf("Welcome to the Currency Exchange Service!\n");
-    displayRates(rates, MAX_CURRENCIES);
+/* 4) computeDifference: a - b */
+double computeDifference(int a, double b) {
+    return static_cast<double>(a) - b;
+}
 
-    char sourceCurrency[MAX_CURRENCY_NAME];
-    printf("Enter the currency you want to exchange from (example: USD, EUR): ");
-    if (scanf("%3s", sourceCurrency) != 1) return 0;
-    strtoupper(sourceCurrency);
+int main() {
+    int intSensor;
+    double dblSensor;
 
-    char targetCurrency[MAX_CURRENCY_NAME];
-    printf("Enter the currency you want to exchange to (example: USD, EUR): ");
-    if (scanf("%3s", targetCurrency) != 1) return 0;
-    strtoupper(targetCurrency);
+    // i) read inputs using cin
+    cout << "Enter integer sensor reading: ";
+    if (!(cin >> intSensor)) return 1;
+    cout << "Enter double sensor reading: ";
+    if (!(cin >> dblSensor)) return 1;
 
-    float amount;
-    float exchangedRate;
-    float exchangedAmount;
-    float leftoverAmount;
-    int found = 0;
-    if (strcmp(sourceCurrency, localcurrency) == 0 && strcmp(targetCurrency, localcurrency) == 0) {
-        printf("Exchanges must be between %s and one supported international currency.\n", localcurrency);
-        return 0;
-    } else {
-        for (int i = 0; i < MAX_CURRENCIES; i++) {
-            /* target is foreign -> converting local -> foreign (use buyRate)
-               amount entered is in local currency */
-            if (strcmp(rates[i].currency, targetCurrency) == 0) {
-                found = 1;
-                printf("Enter the amount in %s to exchange (max %d): ", localcurrency, maxAmount);
-                if (scanf("%f", &amount) != 1) return 0;
+    // ii) calibrate both readings by 2 (pass char '2')
+    int intCal = calibrateValue<int>(intSensor, '2');
+    double dblCal = calibrateValue<double>(dblSensor, '2');
 
-                if (amount > maxAmount) {
-                    printf("Amount exceeds maximum limit of %d %s.\n", maxAmount, localcurrency);
-                } else {
-                    /* use buyRate: local per 1 foreign -> conversion factor local->foreign = 1 / buyRate */
-                    exchangedRate = 1.0f / rates[i].buyRate;
-                    curr_change(amount, (float)maxAmount, exchangedRate, &exchangedAmount, &leftoverAmount);
-                    printf("Rate used: 1 %s = %.4f %s\n", localcurrency, exchangedRate, rates[i].currency);
-                    printf("You will receive %.4f %s for %.2f %s.\n",
-                           exchangedAmount, rates[i].currency, amount, localcurrency);
-                    printf("Leftover returned: %.4f %s\n", leftoverAmount, localcurrency);
-                }
-                break;
-            /* source is foreign -> converting foreign -> local (use sellRate)
-               amount entered is in foreign currency */
-            } else if (strcmp(rates[i].currency, sourceCurrency) == 0) {
-                found = 1;
-                printf("Enter the amount in %s to exchange (max %d): ", sourceCurrency, maxAmount);
-                if (scanf("%f", &amount) != 1) return 0;
+    // formatting: right-aligned, width 10, precision 4
+    cout << fixed << setprecision(4);
 
-                if (amount > 0.0f) {
-                    /* convert foreign amount to local first (foreign * sellRate = local) */
-                    float potentialLocal = amount * rates[i].sellRate;
-                    float convertedLocal = 0.0f;
-                    float leftoverLocal = 0.0f;
-                    curr_change(potentialLocal, (float)maxAmount, 1.0f, &convertedLocal, &leftoverLocal);
-                    /* leftoverLocal is in local currency; convert leftover back to foreign to return to customer */
-                    leftoverAmount = leftoverLocal / rates[i].sellRate;
-                    exchangedAmount = convertedLocal; /* in local currency */
-                    printf("Rate used: 1 %s = %.4f %s\n", rates[i].currency, rates[i].sellRate, localcurrency);
-                    printf("You will receive %.4f %s for %.2f %s.\n",
-                           exchangedAmount, localcurrency, amount, sourceCurrency);
-                    printf("Leftover returned: %.4f %s\n", leftoverAmount, sourceCurrency);
-                } else {
-                    printf("Amount must be positive.\n");
-                }
-                break;
-            }
-        }
+    cout << "\nAfter calibration:\n";
+    cout << right << setw(10) << static_cast<double>(intCal) << "   (calibrated integer)\n";
+    cout << right << setw(10) << dblCal << "   (calibrated double)\n";
 
-        if (!found) {
-            printf("Currency not found.\n");
-        }
-    }
+    // iii) convert calibrated int to double
+    double intAsDouble = static_cast<double>(intCal);
 
+    // iv) adjustReading twice
+    adjustReading(&intAsDouble);                // default offset 1.25
+    adjustReading(&dblCal, 3.4);                // offset 3.4
+
+    cout << "\nAfter adjustment:\n";
+    cout << right << setw(10) << intAsDouble << "   (adjusted from int)\n";
+    cout << right << setw(10) << dblCal << "   (adjusted double)\n";
+
+    // v) clamp both adjusted readings
+    clampReading(intAsDouble);
+    clampReading(dblCal);
+
+    cout << "\nAfter clamping:\n";
+    cout << right << setw(10) << intAsDouble << "   (clamped int-as-double)\n";
+    cout << right << setw(10) << dblCal << "   (clamped double)\n";
+
+    // vi) convert int-as-double back to int
+    int finalInt = static_cast<int>(intAsDouble);
+    cout << "\nFinal integer sensor (converted back):\n";
+    cout << right << setw(10) << static_cast<double>(finalInt) << "   (printed with precision 4)\n";
+
+    // vii) compute difference between clamped double and integer
+    double diff = computeDifference(finalInt, dblCal);
+    cout << "\nDifference (int - double):\n";
+    cout << right << setw(10) << diff << "\n";
 
     return 0;
-}
-
-void displayRates(ExchangeRate rates[], int count) {
-    printf("Available Exchange Rates:\n");
-    for (int i = 0; i < count; i++) {
-        printf("Currency: %s, Buy Rate: %.2f, Sell Rate: %.2f\n",
-               rates[i].currency, rates[i].buyRate, rates[i].sellRate);
-    }
-}
-
-void curr_change(float amCur1, float amMax, float excRate, float *amCur2, float *leftOver) {
-    /* amCur1 and amMax are expected to be in the same currency units when called.
-       excRate converts amCur1 -> amCur2 (amCur2 = amCur1 * excRate).
-       If amCur1 <= amMax -> full conversion, leftover = 0.
-       If amCur1 > amMax -> convert only up to amMax, leftover = amCur1 - amMax. */
-    if (amCur1 <= amMax) {
-        *amCur2 = amCur1 * excRate;
-        *leftOver = 0.0f;
-    } else {
-        *amCur2 = amMax * excRate;
-        *leftOver = amCur1 - amMax;
-    }
 }
